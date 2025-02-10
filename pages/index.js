@@ -1,114 +1,114 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { useState } from 'react';
+import axios from 'axios';
 
 export default function Home() {
-  return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              pages/index.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [gameName, setGameName] = useState('');
+  const [tagLine, setTagLine] = useState('EUW');
+  const [summonerData, setSummonerData] = useState(null);
+  const [liveGameData, setLiveGameData] = useState(null);
+  const [kdaStats, setKdaStats] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await axios.post('/api/summoner', {
+        gameName,
+        tagLine,
+      });
+      setSummonerData(response.data.summoner);
+      setLiveGameData(response.data.liveGame);
+      setKdaStats(response.data.kdaStats);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to fetch summoner data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-blue-500">
+          LoL Summoner Search
+        </h1>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-2">Riot ID</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="JuanInYourFace"
+                value={gameName}
+                onChange={(e) => setGameName(e.target.value)}
+                className="flex-1 p-2 rounded bg-gray-800 border border-gray-700"
+                required
+              />
+              <span className="text-gray-400 py-2">#</span>
+              <input
+                type="text"
+                placeholder="EUW"
+                value={tagLine}
+                onChange={(e) => setTagLine(e.target.value)}
+                className="w-24 p-2 rounded bg-gray-800 border border-gray-700"
+                required
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded font-semibold disabled:opacity-50"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+            {loading ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {error && (
+          <div className="mt-8 bg-red-800 p-4 rounded">
+            Error: {error}
+          </div>
+        )}
+
+        {summonerData && (
+          <div className="mt-8 bg-gray-800 p-6 rounded-lg space-y-4">
+            <h2 className="text-2xl font-bold">{summonerData.name}</h2>
+            <p>Level: {summonerData.summonerLevel}</p>
+            <p className="text-gray-400">Account ID: {summonerData.accountId}</p>
+
+            {kdaStats && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold">Recent KDA Stats</h3>
+                <p>Kills: {kdaStats.kills}</p>
+                <p>Deaths: {kdaStats.deaths}</p>
+                <p>Assists: {kdaStats.assists}</p>
+                <p>Games: {kdaStats.games}</p>
+              </div>
+            )}
+
+            {liveGameData && (
+              <div className="mt-4">
+                <h3 className="text-xl font-semibold">Live Game</h3>
+                <p>Mode: {liveGameData.gameMode}</p>
+                <p>Duration: {Math.floor(liveGameData.gameLength / 60)} minutes</p>
+                <div className="mt-2">
+                  <h4 className="font-semibold">Participants:</h4>
+                  {liveGameData.participants.map((participant, index) => (
+                    <div key={index} className="text-gray-400">
+                      {participant.summonerName} ({participant.championName})
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
